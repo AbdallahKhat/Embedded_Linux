@@ -1,0 +1,488 @@
+System Call Use Case
+
+Imagine you're a software architect encountering performance issues in your software. To address these, you decide to gain insights from the system. You discover that various commands in user space serve similar purposes but may differ in performance. Examples include:
+
+ls vs. find
+cp vs. rsync
+diff vs. cmp
+sort vs. uniq
+grep vs. sed
+
+Main Tasks
+
+1. Time Measurement
+
+-Measure the execution time for each command to assess performance.
+
+2. System Interaction Identification
+
+-Identify which system stack (e.g., file system, network) each command interacts with during execution.
+
+3. Syscall Time Breakdown
+
+-Break down the total execution time of each command into time per system call to understand resource consumption.
+
+4. Performance Evaluation
+
+-Analyze results to determine which command performs better based on execution time, system interaction, and syscall breakdown.
+
+
+Performance analysis of commands:
+
+*Note on Execution Time: The execution time reported by strace -c can vary depending on system load and background processes. Results may differ with each run*
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+[1] ls vs. find
+
+@Execution time reported: (strace -c [ls/find])
+
+-ls    0.000710 sec
+
+-find  0.000629 sec
+
+
+@Syscall Time Breakdown:
+
+-ls
+
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 32.82    0.000233          12        18           mmap
+ 17.04    0.000121          17         7           mprotect
+  9.01    0.000064           9         7           openat
+  6.62    0.000047           9         5           read
+  5.49    0.000039           4         8           newfstatat
+  4.93    0.000035           3         9           close
+  4.79    0.000034          34         1           munmap
+  4.51    0.000032          16         2         2 statfs
+  3.10    0.000022           7         3           brk
+  2.82    0.000020           5         4           pread64
+  2.11    0.000015           7         2         2 access
+  1.41    0.000010           5         2           getdents64
+  0.85    0.000006           6         1           prlimit64
+  0.85    0.000006           6         1           getrandom
+  0.70    0.000005           2         2         1 arch_prctl
+  0.70    0.000005           5         1           set_tid_address
+  0.70    0.000005           5         1           set_robust_list
+  0.70    0.000005           5         1           rseq
+  0.56    0.000004           4         1           write
+  0.28    0.000002           1         2           ioctl
+  0.00    0.000000           0         1           execve
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000710           8        79         5 total
+
+
+-find
+
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 23.21    0.000146           8        18           mmap
+ 13.83    0.000087           6        13         4 openat
+ 12.40    0.000078          11         7           mprotect
+  8.90    0.000056           8         7           read
+  6.84    0.000043           3        13           close
+  5.88    0.000037           3        11           newfstatat
+  3.82    0.000024           6         4           pread64
+  3.66    0.000023          11         2         2 statfs
+  3.50    0.000022          22         1           munmap
+  2.70    0.000017           8         2           getdents64
+  2.07    0.000013           4         3           brk
+  1.75    0.000011           2         4           fcntl
+  1.75    0.000011          11         1           set_robust_list
+  1.43    0.000009           4         2           write
+  1.27    0.000008           4         2           ioctl
+  1.11    0.000007           3         2         2 access
+  0.95    0.000006           6         1           getrandom
+  0.79    0.000005           5         1           uname
+  0.79    0.000005           5         1           fstatfs
+  0.79    0.000005           5         1           set_tid_address
+  0.79    0.000005           5         1           prlimit64
+  0.64    0.000004           2         2         1 arch_prctl
+  0.64    0.000004           4         1           rseq
+  0.48    0.000003           3         1           fchdir
+  0.00    0.000000           0         1           execve
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000629           6       102         9 total
+
+
+@System Interaction Identification: (strace -e trace=[file/memory/process/network] [ls/find])
+
+-ls    [File stack, Memory management stack, Process stack]
+
+-find  [File stack, Memory management stack, Process stack]
+
+
+@Performance Evaluation:
+
+-Both commands have similar execution time with [ls] having only 79 system calls compared to 102 for [find]-
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+[2] cp vs. rsync
+
+@Execution time reported: (strace -c [cp/rsync] ./performance_analysis.txt ./test1)
+
+-cp     0.001196 sec
+
+-rsync  0.002200 sec
+
+
+@Syscall Time Breakdown:
+
+-cp
+
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 32.27    0.000386         386         1           execve
+ 29.43    0.000352          12        28           mmap
+  9.70    0.000116          11        10           openat
+  5.94    0.000071           7        10           mprotect
+  5.02    0.000060           6         9           read
+  4.01    0.000048           3        13         2 newfstatat
+  3.60    0.000043           3        13           close
+  1.76    0.000021           5         4           pread64
+  1.59    0.000019          19         1           write
+  1.00    0.000012           6         2           munmap
+  0.92    0.000011           5         2         2 statfs
+  0.92    0.000011           5         2         1 arch_prctl
+  0.84    0.000010           5         2         2 access
+  0.75    0.000009           3         3           brk
+  0.50    0.000006           6         1           set_tid_address
+  0.50    0.000006           6         1           rseq
+  0.42    0.000005           5         1           set_robust_list
+  0.17    0.000002           2         1         1 lseek
+  0.17    0.000002           2         1           geteuid
+  0.17    0.000002           2         1           fadvise64
+  0.17    0.000002           2         1           prlimit64
+  0.17    0.000002           2         1           getrandom
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.001196          11       108         8 total
+
+
+-rsync
+
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 25.68    0.000565          13        42           mmap
+ 25.00    0.000550         550         1           execve
+ 10.41    0.000229          15        15         2 openat
+ 10.18    0.000224         224         1           clone
+  6.36    0.000140           6        23           read
+  5.00    0.000110           7        14           mprotect
+  3.00    0.000066           4        16         1 newfstatat
+  2.45    0.000054           3        15           close
+  2.09    0.000046           4        11           rt_sigaction
+  1.41    0.000031           2        11           fcntl
+  1.41    0.000031           1        17           futex
+  1.09    0.000024          12         2           socketpair
+  0.95    0.000021           5         4           pread64
+  0.86    0.000019           3         6           brk
+  0.86    0.000019           3         6         3 wait4
+  0.41    0.000009           4         2         1 arch_prctl
+  0.36    0.000008           8         1           munmap
+  0.36    0.000008           8         1         1 access
+  0.32    0.000007           0        13           pselect6
+  0.27    0.000006           6         1           getcwd
+  0.23    0.000005           0         7           write
+  0.23    0.000005           5         1           set_tid_address
+  0.23    0.000005           5         1           set_robust_list
+  0.18    0.000004           2         2           umask
+  0.18    0.000004           4         1           rseq
+  0.09    0.000002           2         1           rt_sigprocmask
+  0.09    0.000002           2         1           geteuid
+  0.09    0.000002           2         1           getegid
+  0.09    0.000002           2         1           prlimit64
+  0.09    0.000002           2         1           getrandom
+  0.00    0.000000           0         1         1 rt_sigreturn
+  0.00    0.000000           0         1           chdir
+  0.00    0.000000           0         3         1 clock_nanosleep
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.002200           9       224        10 total
+
+
+@System Interaction Identification: (strace -e trace=[file/memory/process/network] [cp/rsync] ./performance_analysis.txt ./test1)
+
+-cp     [File stack, Memory management stack, Process stack]
+
+-rsync  [File stack, Memory management stack, Process stack, Network stack]
+
+
+@Performance Evaluation:
+
+-[cp] has less execution time, system calls, and doesn't call the Network stack compared to [rsync]-
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+[3] diff vs. cmp
+
+@Execution time reported: (strace -c [diff/cmp] ./performance_analysis.txt ./test1)
+
+-diff    0.000935 sec
+
+-cmp     0.000795 sec
+
+
+@Syscall Time Breakdown:
+
+-diff
+
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 84.17    0.000787           2       275           write
+  7.06    0.000066           6        10           read
+  2.57    0.000024          12         2           munmap
+  1.50    0.000014           2         7           newfstatat
+  1.39    0.000013           1         8           close
+  1.28    0.000012           4         3           fcntl
+  1.07    0.000010           5         2           rt_sigaction
+  0.53    0.000005           5         1           sigaltstack
+  0.43    0.000004           0        11         4 openat
+  0.00    0.000000           0         1           lseek
+  0.00    0.000000           0        10           mmap
+  0.00    0.000000           0         4           mprotect
+  0.00    0.000000           0         3           brk
+  0.00    0.000000           0         4           pread64
+  0.00    0.000000           0         1         1 access
+  0.00    0.000000           0         1           execve
+  0.00    0.000000           0         2         1 arch_prctl
+  0.00    0.000000           0         1           set_tid_address
+  0.00    0.000000           0         1           set_robust_list
+  0.00    0.000000           0         1           prlimit64
+  0.00    0.000000           0         1           getrandom
+  0.00    0.000000           0         1           rseq
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000935           2       350         6 total
+
+
+-cmp
+
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 48.18    0.000383         383         1           execve
+ 13.96    0.000111          11        10           mmap
+  6.67    0.000053          13         4           mprotect
+  5.53    0.000044           4        11         4 openat
+  5.16    0.000041           4         9           newfstatat
+  3.40    0.000027           3         8           close
+  3.02    0.000024           3         8           read
+  2.77    0.000022          11         2           munmap
+  2.64    0.000021           7         3           brk
+  2.52    0.000020           5         4           pread64
+  1.13    0.000009           9         1           write
+  1.01    0.000008           8         1         1 access
+  1.01    0.000008           4         2         1 arch_prctl
+  0.75    0.000006           6         1           getrandom
+  0.63    0.000005           5         1           set_tid_address
+  0.63    0.000005           5         1           prlimit64
+  0.50    0.000004           4         1           set_robust_list
+  0.50    0.000004           4         1           rseq
+  0.00    0.000000           0         1           lseek
+  0.00    0.000000           0         2           rt_sigaction
+  0.00    0.000000           0         3           fcntl
+  0.00    0.000000           0         1           sigaltstack
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000795          10        76         6 total
+
+
+@System Interaction Identification: (strace -e trace=[file/memory/process/network] [diff/cmp] ./performance_analysis.txt ./test1)
+
+-diff    [File stack, Memory management stack, Process stack]
+
+-cmp     [File stack, Memory management stack, Process stack]
+
+
+@Performance Evaluation:
+
+-Both commands have similar execution time with [cmp] having only 76 system calls compared to 350 for [diff]-
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+[4] sort vs. uniq
+
+@Execution time reported: (strace -c [sort/cmp] ./test1)
+
+-sort     0.000950 sec
+
+-uniq     0.001101 sec
+
+
+@Syscall Time Breakdown:
+
+-sort
+
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ------------------
+ 33.37    0.000317           9        34           write
+ 11.89    0.000113           4        23           rt_sigaction
+ 11.79    0.000112          12         9           mmap
+  5.89    0.000056          14         4           mprotect
+  4.95    0.000047          11         4           openat
+  4.84    0.000046           6         7           newfstatat
+  2.84    0.000027           4         6           close
+  2.84    0.000027          13         2         1 access
+  2.74    0.000026           6         4           prlimit64
+  2.42    0.000023           7         3           read
+  2.42    0.000023          23         1           munmap
+  2.32    0.000022          11         2           sysinfo
+  2.11    0.000020           5         4           pread64
+  1.37    0.000013           4         3           brk
+  1.05    0.000010          10         1           sched_getaffinity
+  0.74    0.000007           7         1           lseek
+  0.74    0.000007           7         1           fcntl
+  0.74    0.000007           7         1           fadvise64
+  0.63    0.000006           6         1           geteuid
+  0.63    0.000006           6         1           getegid
+  0.63    0.000006           6         1           getrandom
+  0.53    0.000005           5         1           getuid
+  0.53    0.000005           5         1           getgid
+  0.53    0.000005           5         1           set_tid_address
+  0.53    0.000005           5         1           set_robust_list
+  0.53    0.000005           5         1           rseq
+  0.42    0.000004           2         2         1 arch_prctl
+  0.00    0.000000           0         1           execve
+------ ----------- ----------- --------- --------- ------------------
+100.00    0.000950           7       121         2 total
+
+
+-uniq
+
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 36.97    0.000407         407         1           execve
+ 21.71    0.000239           7        32           write
+ 12.35    0.000136          15         9           mmap
+  5.54    0.000061          15         4           mprotect
+  4.27    0.000047          11         4           openat
+  3.18    0.000035           5         7           close
+  2.45    0.000027           5         5           newfstatat
+  2.18    0.000024           6         4           pread64
+  2.09    0.000023          23         1           munmap
+  2.00    0.000022           7         3           brk
+  1.73    0.000019           6         3           read
+  0.91    0.000010           5         2         1 arch_prctl
+  0.82    0.000009           9         1         1 access
+  0.64    0.000007           7         1           getrandom
+  0.45    0.000005           5         1           lseek
+  0.45    0.000005           5         1           set_tid_address
+  0.45    0.000005           5         1           fadvise64
+  0.45    0.000005           5         1           set_robust_list
+  0.45    0.000005           5         1           dup3
+  0.45    0.000005           5         1           prlimit64
+  0.45    0.000005           5         1           rseq
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.001101          13        84         2 total
+
+
+@System Interaction Identification: (strace -e trace=[file/memory/process/network] [sort/uniq] ./test1)
+
+-sort     [File stack, Memory management stack, Process stack]
+
+-uniq     [File stack, Memory management stack, Process stack]
+
+
+@Performance Evaluation:
+
+-Both commands have similar execution time with [uniq] having only 84 system calls compared to 121 for [sort]-
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+[5] grep vs. sed
+
+@Execution time reported: (strace -c grep  'memory'  performance_analysis.txt)
+                          (strace -c sed '/memory/p' performance_analysis.txt)
+
+-grep    0.000903 sec
+
+-sed     0.002332 sec
+
+
+@Syscall Time Breakdown:
+
+-grep
+
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 42.19    0.000381         381         1           execve
+ 18.60    0.000168          11        15           mmap
+  9.52    0.000086           7        12         4 openat
+  8.97    0.000081          10         8           read
+  6.31    0.000057          11         5           mprotect
+  2.77    0.000025           2        10           close
+  2.66    0.000024           2        10           newfstatat
+  2.44    0.000022           5         4           pread64
+  1.00    0.000009           2         4           write
+  1.00    0.000009           4         2         1 arch_prctl
+  0.89    0.000008           8         1         1 access
+  0.55    0.000005           2         2           munmap
+  0.55    0.000005           1         3           brk
+  0.55    0.000005           5         1           set_tid_address
+  0.44    0.000004           4         1           lseek
+  0.44    0.000004           4         1           set_robust_list
+  0.44    0.000004           4         1           prlimit64
+  0.44    0.000004           4         1           rseq
+  0.11    0.000001           0         2           rt_sigaction
+  0.11    0.000001           1         1           sigaltstack
+  0.00    0.000000           0         1           futex
+  0.00    0.000000           0         1           getrandom
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000903          10        87         6 total
+
+
+
+-sed
+
+--------------------------------------------------------------------------------------------------------------------------------
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 71.66    0.001671           3       490           write
+ 10.38    0.000242          10        23           mmap
+  4.07    0.000095          10         9           mprotect
+  3.60    0.000084           6        13           read
+  2.74    0.000064           7         9           openat
+  1.59    0.000037           3        10           close
+  1.59    0.000037           3        10           newfstatat
+  0.81    0.000019           4         4           pread64
+  0.64    0.000015          15         1           munmap
+  0.60    0.000014           7         2         2 statfs
+  0.56    0.000013           4         3           brk
+  0.47    0.000011           5         2         2 access
+  0.39    0.000009           4         2         1 arch_prctl
+  0.21    0.000005           5         1           rseq
+  0.17    0.000004           4         1           set_tid_address
+  0.17    0.000004           4         1           set_robust_list
+  0.17    0.000004           4         1           getrandom
+  0.13    0.000003           3         1           prlimit64
+  0.04    0.000001           1         1           futex
+  0.00    0.000000           0         1           execve
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.002332           3       585         5 total
+
+
+
+@System Interaction Identification: (strace -e trace=[file/memory/process/network] grep  'memory'   performance_analysis.txt)
+                                    (strace -e trace=[file/memory/process/network] sed  '/memory/p' performance_analysis.txt)
+
+-grep    [File stack, Memory management stack, Process stack]
+
+-sed     [File stack, Memory management stack, Process stack]
+
+
+@Performance Evaluation:
+
+-[grep] has less execution time, and system calls compared to [sed]-
+
+
+--------------------------------------------------------------------------------------------------------------------------------
