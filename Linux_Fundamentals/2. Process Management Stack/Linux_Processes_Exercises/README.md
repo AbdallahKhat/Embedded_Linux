@@ -32,13 +32,13 @@ An Exercise Using Various Commands Relating to Processes
 
 Use the `ps` command to list all processes running on your system.
 
-![ps.png](https://github.com/AbdallahKhat/Embedded_Linux/blob/0788a16091210dc0f3bb199ebb229a8ed8896d40/Linux_Fundamentals/2.%20Process%20Management%20Stack/Linux_Processes_Exercises/images/ps.png)
+![ps.png](./images/ps.png)
 
 ### **Monitor system processes in real-time**
 
 Run the `top` or `htop` command and identify the most CPU-intensive process.
 
-![top.png](https://github.com/AbdallahKhat/Embedded_Linux/blob/0788a16091210dc0f3bb199ebb229a8ed8896d40/Linux_Fundamentals/2.%20Process%20Management%20Stack/Linux_Processes_Exercises/images/top.png)
+![top.png](./images/top.png)
 
 ### **Start a background process**
 
@@ -46,20 +46,20 @@ Launch a command like `sleep 30` in the background using `&`.
 
 - Verify it is running using `jobs` or `ps`.
 
-![bg.png](https://github.com/AbdallahKhat/Embedded_Linux/blob/0788a16091210dc0f3bb199ebb229a8ed8896d40/Linux_Fundamentals/2.%20Process%20Management%20Stack/Linux_Processes_Exercises/images/bg.png)
+![bg.png](./images/bg.png)
 
 ### **Bring a background process to the foreground**
 
 Use `fg` to bring the background process back to the foreground.
 
-![fg.png](https://github.com/AbdallahKhat/Embedded_Linux/blob/0788a16091210dc0f3bb199ebb229a8ed8896d40/Linux_Fundamentals/2.%20Process%20Management%20Stack/Linux_Processes_Exercises/images/fg.png)
+![fg.png](./images/fg.png)
 
 ### **Suspend and resume a process**
 
 - Start a long-running process (e.g., `ping google.com`).
 - Suspend it using `Ctrl+Z` and resume it with `fg` or `bg`.
 
-![SIGTSTP.png](https://github.com/AbdallahKhat/Embedded_Linux/blob/0788a16091210dc0f3bb199ebb229a8ed8896d40/Linux_Fundamentals/2.%20Process%20Management%20Stack/Linux_Processes_Exercises/images/SIGTSTP.png)
+![SIGTSTP.png](./images/SIGTSTP.png)
 
 ---
 ## **Intermediate Level**
@@ -70,14 +70,14 @@ Use `fg` to bring the background process back to the foreground.
 - Find its Process ID (PID) using `ps` or `pgrep`.
 - Kill it using the `kill` command.
 
-![kill.png](https://github.com/AbdallahKhat/Embedded_Linux/blob/0788a16091210dc0f3bb199ebb229a8ed8896d40/Linux_Fundamentals/2.%20Process%20Management%20Stack/Linux_Processes_Exercises/images/kill.png)
+![kill.png](./images/kill.png)
 
 ### **Terminate multiple processes**
 
 - Start multiple processes (e.g., `sleep 100`, `sleep 200`).
 - Use `pkill` to terminate all processes with a specific name.
 
-![pkill.png](https://github.com/AbdallahKhat/Embedded_Linux/blob/0788a16091210dc0f3bb199ebb229a8ed8896d40/Linux_Fundamentals/2.%20Process%20Management%20Stack/Linux_Processes_Exercises/images/pkill.png)
+![pkill.png](./images/pkill.png)
 
 ### **Niceness levels**
 
@@ -85,19 +85,19 @@ Use `fg` to bring the background process back to the foreground.
 - Check its priority using `ps -o pid,ni,comm`.
 - Change its niceness using `renice`.
 
-![renice.png](https://github.com/AbdallahKhat/Embedded_Linux/blob/0788a16091210dc0f3bb199ebb229a8ed8896d40/Linux_Fundamentals/2.%20Process%20Management%20Stack/Linux_Processes_Exercises/images/renice.png)
+![renice.png](./images/renice.png)
 
 ### **View process hierarchy**
 
 Use the `pstree` command to view the parent-child relationships of processes.
 
-![pstree.png](https://github.com/AbdallahKhat/Embedded_Linux/blob/0788a16091210dc0f3bb199ebb229a8ed8896d40/Linux_Fundamentals/2.%20Process%20Management%20Stack/Linux_Processes_Exercises/images/pstree.png)
+![pstree.png](./images/pstree.png)
 
 ### **Redirect process output**
 
 Run `ping google.com` and redirect its output to a file using `>` or `>>`.
 
-![redirect.png](https://github.com/AbdallahKhat/Embedded_Linux/blob/0788a16091210dc0f3bb199ebb229a8ed8896d40/Linux_Fundamentals/2.%20Process%20Management%20Stack/Linux_Processes_Exercises/images/redirect.png)
+![redirect.png](./images/redirect.png)
 
 ---
 ## **Advanced Level**
@@ -107,14 +107,14 @@ Run `ping google.com` and redirect its output to a file using `>` or `>>`.
 Use `strace` to trace system calls of a command like `ls`.
 Example: `strace ls`.
 
-![strace.png](https://github.com/AbdallahKhat/Embedded_Linux/blob/0788a16091210dc0f3bb199ebb229a8ed8896d40/Linux_Fundamentals/2.%20Process%20Management%20Stack/Linux_Processes_Exercises/images/strace.png)
+![strace.png](./images/strace.png)
 
 ### **Monitor file descriptors**
 
 - Start a process like `vi`.
 - Use `lsof -p <PID>` to check the file descriptors in use by the process.
 
-![lsof.png](https://github.com/AbdallahKhat/Embedded_Linux/blob/0788a16091210dc0f3bb199ebb229a8ed8896d40/Linux_Fundamentals/2.%20Process%20Management%20Stack/Linux_Processes_Exercises/images/lsof.png)
+![lsof.png](./images/lsof.png)
 
 ### **Process scheduling policies**
 
@@ -122,13 +122,13 @@ Example: `strace ls`.
 Example: `chrt -f 10 sleep 100`.
 - Check its policy using `ps`.
 
-![chrt.png](https://github.com/AbdallahKhat/Embedded_Linux/blob/0788a16091210dc0f3bb199ebb229a8ed8896d40/Linux_Fundamentals/2.%20Process%20Management%20Stack/Linux_Processes_Exercises/images/chrt.png)
+![chrt.png](./images/chrt.png)
 
 ### **Limit resource usage**
 
 - Use `ulimit` to limit the CPU time or memory for a process.
 Example: `ulimit -t 5` followed by a CPU-intensive command like `dd if=/dev/zero of=/dev/null`.
 
-![ulimit.png](https://github.com/AbdallahKhat/Embedded_Linux/blob/0788a16091210dc0f3bb199ebb229a8ed8896d40/Linux_Fundamentals/2.%20Process%20Management%20Stack/Linux_Processes_Exercises/images/ulimit.png)
+![ulimit.png](./images/ulimit.png)
 
 ---
