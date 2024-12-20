@@ -98,4 +98,19 @@ function main()
 }
 
 ### Execute main ###
-main
+
+if (( $# == 1 )); then  # Check if a Path was given as a directory
+
+    if [ -d "$1" ]; then    # Check if the Path argument is a real directory
+        main
+
+    else
+        echo "This Directory doesn't Exist"
+    fi
+
+else
+
+    echo "Invalid Number of Arguments"
+
+fi
+
