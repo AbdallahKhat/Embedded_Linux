@@ -1,0 +1,3 @@
+
+
+SYSROOT_DIRS:append="${prefix}/src"
